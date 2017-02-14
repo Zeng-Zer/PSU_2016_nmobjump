@@ -62,7 +62,7 @@ static int	read_shdr(t_elf *elf, int fd)
       exit(1);
     }
   if (read(fd, elf->shdr, sizeof(Elf64_Shdr) * elf->ehdr.e_shnum) !=
-      sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)
+      (int)sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)
     return (file_truncated(elf->filename));
   return (0);
 }

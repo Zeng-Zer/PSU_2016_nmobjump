@@ -67,22 +67,18 @@ static void	print_address(Elf64_Addr addr, unsigned char *section,
     printf(" ");
 }
 
-void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+static void	write_content(char *section, size_t size, Elf64_Addr addr)
 {
-  char		*section;
   size_t	i;
-  Elf64_Addr	addr;
 
-  section = read_section(elf, shdr, fd);
-  addr = shdr->sh_addr;
   i = -1;
-  while (++i < shdr->sh_size)
+  while (++i < size)
     {
       if (i != 0 && i % 16 == 0)
 	printf("\n");
       if (i % 16 == 0)
 	{
-	  print_address(addr, (unsigned char *)section + i, shdr->sh_size - i);
+	  print_address(addr, (unsigned char *)section + i, size - i);
 	  addr += 16;
 	}
       if (isprint(section[i]))
@@ -93,5 +89,17 @@ void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
   while (i++ % 16 != 0)
     printf(" ");
   printf("\n");
+}
+
+void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+{
+  char		*section;
+  Elf64_Addr	addr;
+
+  section = read_section(elf, shdr, fd);
+  if (section == NULL)
+    return ((void)file_truncated(elf->filename));
+  addr = shdr->sh_addr;
+  write_content(section, shdr->sh_size, addr);
   free(section);
 }
