@@ -17,6 +17,7 @@ SRC		:= main.c \
 		parse_elf.c \
 		write_header.c \
 		utils.c \
+		ar_parser.c \
 
 CC		:= gcc
 CFLAGS		:= -W -Wall -Wextra

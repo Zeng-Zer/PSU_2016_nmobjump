@@ -45,12 +45,30 @@ static int	display_file(char const *filename, int fd)
   return (0);
 }
 
+static int	loop_archive(int fd)
+{
+  char		filename[256];
+  int		ret;
+
+  while ((ret = get_next_ar_file(fd, filename)) == 0)
+    {
+      if (ret == -1)
+	return (1);
+      display_file(filename, fd);
+    }
+  return (0);
+}
+
 int		my_objdump(char const *filename)
 {
   int		fd;
 
   if ((fd = open_file(filename)) == -1)
     return (1);
-  // TODO ARCHIVE
+  if (is_archive(fd))
+    {
+      printf("In archive %s:\n", filename);
+      return (loop_archive(fd));
+    }
   return (display_file(filename, fd));
 }

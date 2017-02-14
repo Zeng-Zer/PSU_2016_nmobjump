@@ -60,9 +60,9 @@ static void	print_flags(Elf64_Word flags)
     printf("BFD_NO_FLAGS\n");
 }
 
-static const char	*get_arch(Elf64_Half arch)
+static inline const char	*get_arch(Elf64_Half arch)
 {
-  int		i;
+  int				i;
 
   i = -1;
   while (++i < 10)

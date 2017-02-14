@@ -14,6 +14,7 @@
 # include <elf.h>
 # include <stdbool.h>
 # include "flags.h"
+# include "ar_header.h"
 
 # define MASK(val, mask) ((val & mask) == mask)
 
@@ -33,9 +34,9 @@ typedef struct	s_pair
 
 extern char	*g_prog_name;
 
-int	my_objdump(char const *filename);
-int	parse_elf(t_elf *elf, int fd);
-int	file_truncated(char const *filename);
-void	write_header(t_elf *elf);
+int		my_objdump(char const *filename);
+int		parse_elf(t_elf *elf, int fd);
+int		file_truncated(char const *filename);
+void		write_header(t_elf *elf);
 
 #endif /* !MY_OBJDUMP_H_ */
