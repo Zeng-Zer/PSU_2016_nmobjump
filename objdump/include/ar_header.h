@@ -12,6 +12,7 @@
 # define AR_HEADER_H_
 
 # include <stdbool.h>
+# include <stdlib.h>
 
 # define ARMAG	"!<arch>\n"	/* String that begins an archive file.  */
 # define SARMAG	8		/* Size of that string.  */
@@ -29,6 +30,6 @@ typedef struct	s_ar
 }		t_ar;
 
 bool	is_archive(int fd);
-int	get_next_ar_file(int fd, char *filename);
+int	get_next_ar_file(int fd, char *filename, size_t *offset);
 
 #endif /* !AR_HEADER_H_ */

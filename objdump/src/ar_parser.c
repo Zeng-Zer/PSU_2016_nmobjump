@@ -24,10 +24,11 @@ bool	is_archive(int fd)
   return (false);
 }
 
-int	get_next_ar_file(int fd, char *filename)
+int	get_next_ar_file(int fd, char *filename, size_t *offset)
 {
   // TODO READ ARCHIVE AND GET NEXT FILE
   (void)fd;
   (void)filename;
+  (void)offset;
   return (1);
 }

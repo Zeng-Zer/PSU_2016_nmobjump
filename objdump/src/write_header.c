@@ -75,11 +75,7 @@ static inline const char	*get_arch(Elf64_Half arch)
 
 void		write_header(t_elf *elf)
 {
-  char		*file_format;
-
-  file_format = elf->ehdr.e_ident[EI_CLASS] == ELFCLASS64 ?
-    "elf64-x86-64" : "elf32-i386";
-  printf("\n%s:     file format %s\n", elf->filename, file_format);
+  printf("\n%s:     file format %s\n", elf->filename, "elf64-x86-64");
   printf("architecture: %s, flags 0x%08x:\n", get_arch(elf->ehdr.e_machine),
 	 elf->ehdr.e_flags);
   print_flags(elf->ehdr.e_flags);

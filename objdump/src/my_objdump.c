@@ -52,16 +52,19 @@ static void	write_all_sections(t_elf *elf, int fd)
 	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA) ||
 	   !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
 	  shdr->sh_size != 0)
-	write_section(elf, shdr, fd);
+	{
+	  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
+	  write_section(elf, shdr, fd);
+	}
     }
 }
 
-static int	display_file(char const *filename, int fd)
+static int	display_file(char const *filename, int fd, size_t offset)
 {
   t_elf		elf;
 
   elf.shstrtab = NULL;
-  elf.file_start = 0;
+  elf.file_start = offset;
   elf.filename = filename;
   if (parse_elf(&elf, fd) != 0)
     return (1);
@@ -75,12 +78,16 @@ static int	display_file(char const *filename, int fd)
 static int	loop_archive(int fd)
 {
   char		filename[256];
+  int		ret;
+  size_t	offset;
 
-  while (get_next_ar_file(fd, filename) == 0)
+  while ((ret = get_next_ar_file(fd, filename, &offset)) == 0)
     {
-      if (display_file(filename, fd) == 1)
+      if (display_file(filename, fd, offset) == 1)
 	return (1);
     }
+  if (ret == 1)
+    return (1);
   return (0);
 }
 
@@ -95,5 +102,5 @@ int		my_objdump(char const *filename)
       printf("In archive %s:\n", filename);
       return (loop_archive(fd));
     }
-  return (display_file(filename, fd));
+  return (display_file(filename, fd, 0));
 }

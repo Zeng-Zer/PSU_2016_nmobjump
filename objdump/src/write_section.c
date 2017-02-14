@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
 #include "my_objdump.h"
 
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
@@ -36,7 +37,61 @@ char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
   return (section);
 }
 
-void	write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+static void	print_address(Elf64_Addr addr, unsigned char *section,
+			      size_t size)
 {
-  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
+  size_t	i;
+  int		j;
+  int		k;
+  int		nb_printed;
+
+  nb_printed = 0;
+  printf(" %04lx ", addr);
+  j = -1;
+  i = 0;
+  while (++j < 4)
+    {
+      k = -1;
+      while (++k < 4)
+	{
+	  if (i < size)
+	    {
+	      nb_printed += printf("%02x", section[i]);
+	    }
+	  ++i;
+	  /* printf("%02x", section[i++]); */
+	}
+      nb_printed += printf(" ");
+    }
+  while (nb_printed++ < 37)
+    printf(" ");
+}
+
+void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+{
+  char		*section;
+  size_t	i;
+  Elf64_Addr	addr;
+
+  section = read_section(elf, shdr, fd);
+  addr = shdr->sh_addr;
+  i = -1;
+  while (++i < shdr->sh_size)
+    {
+      if (i != 0 && i % 16 == 0)
+	printf("\n");
+      if (i % 16 == 0)
+	{
+	  print_address(addr, (unsigned char *)section + i, shdr->sh_size - i);
+	  addr += 16;
+	}
+      if (isprint(section[i]))
+	printf("%c", section[i]);
+      else
+	printf(".");
+    }
+  while (i++ % 16 != 0)
+    printf(" ");
+  printf("\n");
+  free(section);
 }
