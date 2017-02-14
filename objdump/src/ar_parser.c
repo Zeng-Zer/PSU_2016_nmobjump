@@ -29,5 +29,5 @@ int	get_next_ar_file(int fd, char *filename)
   // TODO READ ARCHIVE AND GET NEXT FILE
   (void)fd;
   (void)filename;
-  return (0);
+  return (1);
 }

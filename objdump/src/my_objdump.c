@@ -48,13 +48,11 @@ static int	display_file(char const *filename, int fd)
 static int	loop_archive(int fd)
 {
   char		filename[256];
-  int		ret;
 
-  while ((ret = get_next_ar_file(fd, filename)) == 0)
+  while (get_next_ar_file(fd, filename) == 0)
     {
-      if (ret == -1)
+      if (display_file(filename, fd) == 1)
 	return (1);
-      display_file(filename, fd);
     }
   return (0);
 }
