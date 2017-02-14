@@ -53,25 +53,28 @@ static void	add_flags(t_elf *elf, Elf64_Shdr *shdr, bool e_type)
     }
 }
 
-static int	check_shdr(t_elf *elf, int fd)
+static int	read_shdr(t_elf *elf, int fd)
 {
-  int		ret;
-  int		i;
-
   lseek(fd, elf->ehdr.e_shoff - sizeof(Elf64_Ehdr), SEEK_CUR);
   if ((elf->shdr = malloc(sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)) == NULL)
     {
       fprintf(stderr, "Malloc out of memory\n");
-      return (1);
+      exit(1);
     }
+  if (read(fd, elf->shdr, sizeof(Elf64_Shdr) * elf->ehdr.e_shnum) !=
+      sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)
+    return (file_truncated(elf->filename));
+  return (0);
+}
+
+static int	check_shdr(t_elf *elf, int fd)
+{
+  int		i;
+
   i = -1;
+  elf->shstrtab = read_section(elf, &elf->shdr[elf->ehdr.e_shstrndx], fd);
   while (++i < elf->ehdr.e_shnum)
     {
-      ret = read(fd, &elf->shdr[i], sizeof(Elf64_Shdr));
-      if (ret == 0)
-	return (1);
-      if (ret != sizeof(Elf64_Shdr))
-	return (file_truncated(elf->filename));
       // TODO VERIFY ??
       add_flags(elf, &elf->shdr[i], false);
     }
@@ -81,7 +84,7 @@ static int	check_shdr(t_elf *elf, int fd)
 int	parse_elf(t_elf *elf, int fd)
 {
   if (check_ident(&elf->ehdr, fd, elf->filename) != 0 ||
-      check_shdr(elf, fd) != 0)
+      read_shdr(elf, fd) != 0 || check_shdr(elf, fd) != 0)
     return (1);
   add_flags(elf, NULL, true);
   return (0);

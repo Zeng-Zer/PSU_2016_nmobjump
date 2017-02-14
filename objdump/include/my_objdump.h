@@ -13,6 +13,7 @@
 
 # include <elf.h>
 # include <stdbool.h>
+# include <stdlib.h>
 # include "flags.h"
 # include "ar_header.h"
 
@@ -22,8 +23,10 @@ typedef struct	s_elf
 {
   Elf64_Ehdr	ehdr;
   Elf64_Shdr	*shdr;
+  char		*shstrtab;
   char const	*filename;
   bool		is_archive;
+  size_t	file_start;
 }		t_elf;
 
 typedef struct	s_pair
@@ -38,5 +41,7 @@ int		my_objdump(char const *filename);
 int		parse_elf(t_elf *elf, int fd);
 int		file_truncated(char const *filename);
 void		write_header(t_elf *elf);
+void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd);
+char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
 
 #endif /* !MY_OBJDUMP_H_ */

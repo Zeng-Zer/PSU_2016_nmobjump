@@ -16,6 +16,7 @@ SRC		:= main.c \
 		my_objdump.c \
 		parse_elf.c \
 		write_header.c \
+		write_section.c \
 		utils.c \
 		ar_parser.c \
 
