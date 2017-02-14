@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 #include "my_objdump.h"
 
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
@@ -37,8 +38,7 @@ char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
   return (section);
 }
 
-static void	print_address(Elf64_Addr addr, unsigned char *section,
-			      size_t size)
+static void	print_address(unsigned char *section, size_t size)
 {
   size_t	i;
   int		j;
@@ -46,7 +46,6 @@ static void	print_address(Elf64_Addr addr, unsigned char *section,
   int		nb_printed;
 
   nb_printed = 0;
-  printf(" %04lx ", addr);
   j = -1;
   i = 0;
   while (++j < 4)
@@ -55,11 +54,8 @@ static void	print_address(Elf64_Addr addr, unsigned char *section,
       while (++k < 4)
 	{
 	  if (i < size)
-	    {
-	      nb_printed += printf("%02x", section[i]);
-	    }
+	    nb_printed += printf("%02x", section[i]);
 	  ++i;
-	  /* printf("%02x", section[i++]); */
 	}
       nb_printed += printf(" ");
     }
@@ -67,18 +63,35 @@ static void	print_address(Elf64_Addr addr, unsigned char *section,
     printf(" ");
 }
 
+static void	get_addr_nb(Elf64_Addr addr, size_t size, char *str)
+{
+  char		buf[256];
+  size_t	len;
+
+  sprintf(buf, "%lx", addr + size);
+  len = strlen(buf);
+  len = len > 4 ? len : 4;
+  sprintf(buf, "%lu", len);
+  strcpy(str, " %0");
+  strcat(str, buf);
+  strcat(str, "lx ");
+}
+
 static void	write_content(char *section, size_t size, Elf64_Addr addr)
 {
   size_t	i;
+  char		buf[16];
 
   i = -1;
+  get_addr_nb(addr, size, buf);
   while (++i < size)
     {
       if (i != 0 && i % 16 == 0)
 	printf("\n");
       if (i % 16 == 0)
 	{
-	  print_address(addr, (unsigned char *)section + i, size - i);
+	  printf(buf, addr);
+	  print_address((unsigned char *)section + i, size - i);
 	  addr += 16;
 	}
       if (isprint(section[i]))
