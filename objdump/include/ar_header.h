@@ -31,6 +31,6 @@ typedef struct	s_ar
 
 bool	is_archive(int fd);
 int	get_next_ar_file(int fd, char *filename, size_t *offset);
-void	skip_first(int fd);
+int	skip_first(int fd);
 
 #endif /* !AR_HEADER_H_ */

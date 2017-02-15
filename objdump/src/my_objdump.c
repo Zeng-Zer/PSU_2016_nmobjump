@@ -112,7 +112,10 @@ int		my_objdump(char const *filename)
     {
       printf("In archive %s:\n", filename);
       if ((ret = loop_archive(fd)) == -1)
-	fprintf(stderr, "%s: %s: Malformed archive\n", g_prog_name, filename);
+	{
+	  fprintf(stderr, "%s: %s: Malformed archive\n", g_prog_name, filename);
+	  return (1);
+	}
       return (ret);
     }
   return (display_file(filename, fd, 0));
