@@ -62,12 +62,13 @@ static void	write_all_sections(t_elf *elf, int fd)
 static int	display_file(char const *filename, int fd, size_t offset)
 {
   t_elf		elf;
+  int		ret;
 
   elf.shstrtab = NULL;
   elf.file_start = offset;
   elf.filename = filename;
-  if (parse_elf(&elf, fd) != 0)
-    return (1);
+  if ((ret = parse_elf(&elf, fd)) != 0)
+    return (ret);
   write_header(&elf);
   write_all_sections(&elf, fd);
   free(elf.shdr);
@@ -77,30 +78,42 @@ static int	display_file(char const *filename, int fd, size_t offset)
 
 static int	loop_archive(int fd)
 {
-  char		filename[256];
+  char		filename[1024];
   int		ret;
+  int		ret2;
+  int		ret3;
   size_t	offset;
 
+  ret2 = 0;
+  skip_first(fd);
   while ((ret = get_next_ar_file(fd, filename, &offset)) == 0)
     {
-      if (display_file(filename, fd, offset) == 1)
-	return (1);
+      if ((ret3 = display_file(filename, fd, offset)) == 1)
+	ret2 = 1;
+      if (ret3 == -1)
+	{
+	  ret = 1;
+	  break;
+	}
     }
   if (ret == 1)
-    return (1);
-  return (0);
+    return (-1);
+  return (ret2);
 }
 
 int		my_objdump(char const *filename)
 {
   int		fd;
+  int		ret;
 
   if ((fd = open_file(filename)) == -1)
     return (1);
   if (is_archive(fd))
     {
       printf("In archive %s:\n", filename);
-      return (loop_archive(fd));
+      if ((ret = loop_archive(fd)) == -1)
+	fprintf(stderr, "%s: %s: Malformed archive\n", g_prog_name, filename);
+      return (ret);
     }
   return (display_file(filename, fd, 0));
 }

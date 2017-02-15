@@ -70,13 +70,26 @@ static int	read_shdr(t_elf *elf, int fd)
 static int	check_shdr(t_elf *elf, int fd)
 {
   int		i;
+  Elf64_Shdr	*shdr;
 
   i = -1;
-  elf->shstrtab = read_section(elf, &elf->shdr[elf->ehdr.e_shstrndx], fd);
+  if ((elf->shstrtab = read_section(elf, &elf->shdr[elf->ehdr.e_shstrndx], fd))
+       == NULL)
+    {
+      fprintf(stderr, "%s: %s: File format not recognized\n",
+	      g_prog_name, elf->filename);
+      return (1);
+    }
   while (++i < elf->ehdr.e_shnum)
     {
-      // TODO VERIFY ??
-      add_flags(elf, &elf->shdr[i], false);
+      shdr = &elf->shdr[i];
+      if (shdr->sh_name > elf->shdr[elf->ehdr.e_shstrndx].sh_size)
+	{
+	  fprintf(stderr, "%s: %s: File format not recognized\n",
+	  	  g_prog_name, elf->filename);
+	  return (1);
+	}
+      add_flags(elf, shdr, false);
     }
   return (0);
 }
@@ -84,8 +97,10 @@ static int	check_shdr(t_elf *elf, int fd)
 int	parse_elf(t_elf *elf, int fd)
 {
   if (check_ident(&elf->ehdr, fd, elf->filename) != 0 ||
-      read_shdr(elf, fd) != 0 || check_shdr(elf, fd) != 0)
+      read_shdr(elf, fd) != 0)
     return (1);
+  if (check_shdr(elf, fd) == 1)
+    return (-1);
   add_flags(elf, NULL, true);
   return (0);
 }

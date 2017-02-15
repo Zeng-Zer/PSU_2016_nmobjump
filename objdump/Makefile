@@ -21,7 +21,7 @@ SRC		:= main.c \
 		ar_parser.c \
 
 CC		:= gcc
-CFLAGS		:= -W -Wall -Wextra
+CFLAGS		:= -W -Wall -Wextra -g
 SRC		:= $(addprefix $(SRCDIR), $(SRC))
 OBJ		:= $(SRC:.c=.o)
 RM		:= rm -f
