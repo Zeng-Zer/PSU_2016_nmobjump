@@ -30,7 +30,8 @@ typedef struct	s_ar
 }		t_ar;
 
 bool	is_archive(int fd);
-int	get_next_ar_file(int fd, char *filename, size_t *offset);
+int	get_next_ar_file(int fd, char **filename, size_t *offset);
 int	skip_first(int fd);
+bool	only_whitespace(char const *str, int size);
 
 #endif /* !AR_HEADER_H_ */

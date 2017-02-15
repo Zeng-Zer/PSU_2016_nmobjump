@@ -78,7 +78,7 @@ static int	display_file(char const *filename, int fd, size_t offset)
 
 static int	loop_archive(int fd)
 {
-  char		filename[1024];
+  char		*filename;
   int		ret;
   int		ret2;
   int		ret3;
@@ -86,10 +86,12 @@ static int	loop_archive(int fd)
 
   ret2 = 0;
   skip_first(fd);
-  while ((ret = get_next_ar_file(fd, filename, &offset)) == 0)
+  filename = NULL;
+  while ((ret = get_next_ar_file(fd, &filename, &offset)) == 0)
     {
       if ((ret3 = display_file(filename, fd, offset)) == 1)
 	ret2 = 1;
+      free(filename);
       if (ret3 == -1)
 	{
 	  ret = 1;

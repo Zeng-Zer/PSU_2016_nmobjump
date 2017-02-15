@@ -17,3 +17,16 @@ int	file_truncated(char const *filename)
   fprintf(stderr, "%s: %s: File truncated\n", g_prog_name, filename);
   return (1);
 }
+
+bool	only_whitespace(char const *str, int size)
+{
+  int	i;
+
+  i = -1;
+  while (++i < size)
+    {
+      if (str[i] != ' ')
+	return (false);
+    }
+  return (true);
+}
