@@ -16,18 +16,22 @@ int	main(int argc, char *argv[])
 {
   int	i;
   int	ret;
+  bool	many;
 
   i = 0;
   ret = 0;
   g_prog_name = argv[0];
+  many = false;
   if (argc == 1)
     {
-      if (my_nm("a.out") == 1)
+      if (my_nm("a.out", false) == 1)
 	ret = 1;
     }
+  if (argc > 2)
+    many = true;
   while (++i < argc)
     {
-      if (my_nm(argv[i]) == 1)
+      if (my_nm(argv[i], many) == 1)
 	ret = 1;
     }
   return (ret);

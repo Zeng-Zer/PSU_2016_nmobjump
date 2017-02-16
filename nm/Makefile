@@ -12,7 +12,12 @@ NAME		:= my_nm
 SRCDIR		:= src/
 INCLUDE		:= include/
 
-SRC		:= main.c
+SRC		:= main.c \
+		my_nm.c \
+		utils.c \
+		parse_elf.c \
+		ar_parser.c \
+		write_symbol.c \
 
 CC		:= gcc
 CFLAGS		:= -W -Wall -Wextra -g

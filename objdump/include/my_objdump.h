@@ -25,7 +25,6 @@ typedef struct	s_elf
   Elf64_Shdr	*shdr;
   char		*shstrtab;
   char const	*filename;
-  bool		is_archive;
   size_t	file_start;
 }		t_elf;
 
