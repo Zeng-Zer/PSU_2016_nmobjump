@@ -17,6 +17,7 @@ SRC		:= main.c \
 		utils.c \
 		parse_elf.c \
 		ar_parser.c \
+		ar_filename.c \
 		write_symbol.c \
 
 CC		:= gcc

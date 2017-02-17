@@ -58,11 +58,13 @@ static int	loop_archive(int fd)
   int		ret2;
   int		ret3;
   size_t	offset;
+  t_cont	cont;
 
   ret2 = 0;
   skip_first(fd);
   filename = NULL;
-  while ((ret = get_next_ar_file(fd, &filename, &offset)) == 0)
+  cont = (t_cont) {.next = 0, .tab = NULL, .idx = 0};
+  while ((ret = get_next_ar_file(fd, &filename, &offset, &cont)) == 0)
     {
       if ((ret3 = display_file(filename, fd, offset, true)) == 1)
 	ret2 = 1;
@@ -73,9 +75,7 @@ static int	loop_archive(int fd)
 	  break;
 	}
     }
-  if (ret == 1)
-    return (-1);
-  return (ret2);
+  return (ret == 1 ? -1 : ret2);
 }
 
 int	my_nm(char const *filename, bool many)
