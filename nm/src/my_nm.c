@@ -28,25 +28,6 @@ static int	open_file(char const *filename)
   return (fd);
 }
 
-static int	write_all_symbol(t_elf *elf, bool many)
-{
-  size_t	i;
-  size_t	j;
-  Elf64_Sym	*sym;
-
-  if (many)
-    printf("\n%s:\n", elf->filename);
-  j = 0;
-  i = -1;
-  while (++i < elf->symsize)
-    {
-      sym = &elf->symtab[j++];
-      if (sym->st_name != STN_UNDEF && sym->st_info != STT_FILE)
-	write_symbol(elf, sym);
-    }
-  return (0);
-}
-
 static int	display_file(char const *filename, int fd, size_t offset,
 			     bool many)
 {

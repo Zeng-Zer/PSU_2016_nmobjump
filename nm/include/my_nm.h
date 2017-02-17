@@ -19,6 +19,7 @@
 # include <stdio.h>
 # include <string.h>
 # include <elf.h>
+# include <locale.h>
 # include "ar_header.h"
 
 # define MASK(val, mask) ((val & mask) == mask)
@@ -28,7 +29,6 @@ typedef struct	s_elf
   Elf64_Ehdr	ehdr;
   Elf64_Shdr	*shdr;
   Elf64_Sym	*symtab;
-  Elf64_Word	symlink;
   size_t	symsize;
   char const	*filename;
   char		*shstrtab;
@@ -45,6 +45,6 @@ int		file_truncated(char const *filename);
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
 char		*get_sh_name(t_elf *elf, Elf64_Word sh_name);
 char		*get_sym_name(t_elf *elf, Elf64_Word sh_name);
-int		write_symbol(t_elf *elf, Elf64_Sym *sym);
+int		write_all_symbol(t_elf *elf, bool many);
 
 #endif /* !MY_NM_H_ */

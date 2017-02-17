@@ -55,7 +55,6 @@ static int	read_sh(t_elf *elf, Elf64_Shdr *shdr, int fd)
     {
       elf->symtab = (Elf64_Sym *)read_section(elf, shdr, fd);
       elf->symsize = shdr->sh_size / sizeof(Elf64_Sym);
-      elf->symlink = shdr->sh_link;
     }
   return (0);
 }
