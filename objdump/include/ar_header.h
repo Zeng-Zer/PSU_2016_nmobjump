@@ -29,9 +29,17 @@ typedef struct	s_ar
   char		ar_fmag[2];		/* Always contains ARFMAG.  */
 }		t_ar;
 
+typedef struct	s_cont
+{
+  size_t	next;
+  char		**tab;
+  int		idx;
+}		t_cont;
+
 bool	is_archive(int fd);
-int	get_next_ar_file(int fd, char **filename, size_t *offset);
+int	get_next_ar_file(int fd, char **filename, size_t *offset, t_cont *cont);
 int	skip_first(int fd);
 bool	only_whitespace(char const *str, int size);
+char	*ar_filename(t_ar *ar, int fd, t_cont *cont);
 
 #endif /* !AR_HEADER_H_ */

@@ -61,8 +61,7 @@ static char	*get_filename(t_ar *ar, int fd)
   char		*name;
 
   name = NULL;
-  if (strncmp(ar->ar_name, "//", 2) == 0 &&
-      only_whitespace(ar->ar_date, 12) &&
+  if (strncmp(ar->ar_name, "//", 2) == 0 && only_whitespace(ar->ar_date, 12) &&
       only_whitespace(ar->ar_uid, 6) && only_whitespace(ar->ar_gid, 6) &&
       only_whitespace(ar->ar_mode, 8))
     {
@@ -81,20 +80,18 @@ static char	*get_filename(t_ar *ar, int fd)
   return (name);
 }
 
-int		get_next_ar_file(int fd, char **filename, size_t *offset)
+int		get_next_ar_file(int fd, char **filename, size_t *offset, t_cont *cont)
 {
-  static size_t	next = 0;
   t_ar		ar;
   int		ret;
   char		buf[17];
 
-  memset(&ar, 0, sizeof(t_ar));
-  if (next != 0)
-    lseek(fd, next, SEEK_SET);
+  if (cont->next != 0)
+    lseek(fd, cont->next, SEEK_SET);
   ret = read(fd, &ar, sizeof(t_ar));
   if (ret == 0)
     return (-1);
-  *filename = get_filename(&ar, fd);
+  *filename = ar_filename(&ar, fd, cont);
   if (*filename == NULL)
     return (1);
   *offset = lseek(fd, 0, SEEK_CUR);
@@ -105,6 +102,6 @@ int		get_next_ar_file(int fd, char **filename, size_t *offset)
   strncpy(buf, ar.ar_size, 16);
   if (atol(buf) == 0)
     return (1);
-  next = *offset + atol(buf);
+  cont->next = *offset + atol(buf);
   return (0);
 }

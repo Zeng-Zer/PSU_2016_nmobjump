@@ -19,6 +19,7 @@ SRC		:= main.c \
 		write_section.c \
 		utils.c \
 		ar_parser.c \
+		ar_filename.c \
 
 CC		:= gcc
 CFLAGS		:= -W -Wall -Wextra -g
