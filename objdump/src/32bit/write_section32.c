@@ -36,7 +36,7 @@ static void	print_address(unsigned char *section, size_t size)
     printf(" ");
 }
 
-static void	get_addr_nb(Elf64_Addr addr, size_t size, char *str)
+static void	get_addr_nb(Elf32_Addr addr, size_t size, char *str)
 {
   char		buf[256];
   size_t	len;
@@ -50,7 +50,7 @@ static void	get_addr_nb(Elf64_Addr addr, size_t size, char *str)
   strcat(str, "lx ");
 }
 
-static void	write_content(char *section, size_t size, Elf64_Addr addr)
+static void	write_content(char *section, size_t size, Elf32_Addr addr)
 {
   size_t	i;
   char		buf[16];
@@ -77,12 +77,12 @@ static void	write_content(char *section, size_t size, Elf64_Addr addr)
   printf("\n");
 }
 
-static void	write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+static void	write_section(t_elf *elf, Elf32_Shdr *shdr, int fd)
 {
   char		*section;
-  Elf64_Addr	addr;
+  Elf32_Addr	addr;
 
-  section = read_section(elf, shdr, fd);
+  section = read_section32(elf, shdr, fd);
   if (section == NULL)
     return ((void)file_truncated(elf->filename));
   addr = shdr->sh_addr;
@@ -90,26 +90,27 @@ static void	write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
   free(section);
 }
 
-void		write_all_sections(t_elf *elf, int fd)
+void		write_all_sections32(t_elf *elf, int fd)
 {
   int		i;
-  Elf64_Shdr	*shdr;
-  Elf64_Word	type;
+  Elf32_Shdr	*shdr;
+  Elf32_Word	type;
   char		*name;
 
   i = -1;
-  while (++i < elf->ehdr.e_shnum)
+  while (++i < elf->e32r.e_shnum)
     {
-      shdr = &elf->shdr[i];
+      shdr = &elf->s32r[i];
       type = shdr->sh_type;
       name = &elf->shstrtab[shdr->sh_name];
       if (type != SHT_NULL && type != SHT_NOBITS && type != SHT_SYMTAB &&
       	  strcmp(name, ".shstrtab") != 0 && strcmp(name, ".strtab") != 0 &&
-	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA) ||
-	   !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
+	  ((MASK(elf->e32r.e_flags, HAS_RELOC) &&
+	    type != SHT_RELA && type != SHT_REL) ||
+	   !MASK(elf->e32r.e_flags, HAS_RELOC)) &&
 	  shdr->sh_size != 0)
 	{
-	  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
+	  printf("Contents of section %s:\n", name);
 	  write_section(elf, shdr, fd);
 	}
     }

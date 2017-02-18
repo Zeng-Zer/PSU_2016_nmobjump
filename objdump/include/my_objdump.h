@@ -53,4 +53,10 @@ void		write_all_sections(t_elf *elf, int fd);
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
 int		check_ident(t_elf *elf, int fd);
 
+// 32 bits
+char		*read_section32(t_elf *elf, Elf32_Shdr *sh, int fd);
+int		parse_elf32(t_elf *elf, int fd);
+void		write_header32(t_elf *elf);
+void		write_all_sections32(t_elf *elf, int fd);
+
 #endif /* !MY_OBJDUMP_H_ */

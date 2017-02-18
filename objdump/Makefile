@@ -20,6 +20,10 @@ SRC		:= main.c \
 		write_header.c \
 		write_section.c \
 		utils.c \
+		32bit/parse_elf32.c \
+		32bit/write_header32.c \
+		32bit/write_section32.c \
+		32bit/utils32.c \
 		ar_parser.c \
 		ar_filename.c \
 

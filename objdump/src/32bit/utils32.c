@@ -10,26 +10,7 @@
 
 #include "my_objdump.h"
 
-int	file_truncated(char const *filename)
-{
-  fprintf(stderr, "%s: %s: File truncated\n", g_prog_name, filename);
-  return (1);
-}
-
-bool	only_whitespace(char const *str, int size)
-{
-  int	i;
-
-  i = -1;
-  while (++i < size)
-    {
-      if (str[i] != ' ')
-	return (false);
-    }
-  return (true);
-}
-
-char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
+char		*read_section32(t_elf *elf, Elf32_Shdr *sh, int fd)
 {
   char		*section;
   size_t	old_pos;

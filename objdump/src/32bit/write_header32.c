@@ -27,7 +27,7 @@ static t_pair const arch_map[10] =
 {
   {0, "Unknown"},
   {2, "Sparc"},
-  {3, "x86"},
+  {3, "i386"},
   {8, "MIPS"},
   {0x14, "PowerPC"},
   {0x28, "ARM"},
@@ -37,7 +37,7 @@ static t_pair const arch_map[10] =
   {0xB7 , "AArch64"}
 };
 
-static void	print_flags(Elf64_Word flags)
+static void	print_flags(Elf32_Word flags)
 {
   int		i;
   bool		has_flag;
@@ -60,7 +60,7 @@ static void	print_flags(Elf64_Word flags)
     printf("BFD_NO_FLAGS\n");
 }
 
-static inline const char	*get_arch(Elf64_Half arch)
+static inline const char	*get_arch(Elf32_Half arch)
 {
   int				i;
 
@@ -73,11 +73,11 @@ static inline const char	*get_arch(Elf64_Half arch)
   return ("Unknown");
 }
 
-void		write_header(t_elf *elf)
+void		write_header32(t_elf *elf)
 {
-  printf("\n%s:     file format %s\n", elf->filename, "elf64-x86-64");
-  printf("architecture: %s, flags 0x%08x:\n", get_arch(elf->ehdr.e_machine),
-	 elf->ehdr.e_flags);
-  print_flags(elf->ehdr.e_flags);
-  printf("start address 0x%016lx\n\n", elf->ehdr.e_entry);
+  printf("\n%s:     file format %s\n", elf->filename, "elf32-i386");
+  printf("architecture: %s, flags 0x%08x:\n", get_arch(elf->e32r.e_machine),
+	 elf->e32r.e_flags);
+  print_flags(elf->e32r.e_flags);
+  printf("start address 0x%08x\n\n", elf->e32r.e_entry);
 }

@@ -10,36 +10,36 @@
 
 #include "my_objdump.h"
 
-static void	add_flags(t_elf *elf, Elf64_Shdr *shdr, bool e_type)
+static void	add_flags(t_elf *elf, Elf32_Shdr *shdr, bool e_type)
 {
   if (e_type)
     {
-      if (elf->ehdr.e_type == ET_REL)
-	elf->ehdr.e_flags |= HAS_RELOC;
-      else if (elf->ehdr.e_type == ET_EXEC)
-	elf->ehdr.e_flags |= EXEC_P;
-      else if (elf->ehdr.e_type == ET_DYN)
-	elf->ehdr.e_flags |= DYNAMIC;
+      if (elf->e32r.e_type == ET_REL)
+	elf->e32r.e_flags |= HAS_RELOC;
+      else if (elf->e32r.e_type == ET_EXEC)
+	elf->e32r.e_flags |= EXEC_P;
+      else if (elf->e32r.e_type == ET_DYN)
+	elf->e32r.e_flags |= DYNAMIC;
     }
   else
     {
       if (shdr->sh_type == SHT_SYMTAB || shdr->sh_type == SHT_DYNSYM)
-	elf->ehdr.e_flags |= HAS_SYMS;
+	elf->e32r.e_flags |= HAS_SYMS;
       else if (shdr->sh_type == SHT_DYNAMIC)
-	elf->ehdr.e_flags |= D_PAGED;
+	elf->e32r.e_flags |= D_PAGED;
     }
 }
 
 static int	read_shdr(t_elf *elf, int fd)
 {
-  lseek(fd, elf->ehdr.e_shoff - sizeof(Elf64_Ehdr), SEEK_CUR);
-  if ((elf->shdr = malloc(sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)) == NULL)
+  lseek(fd, elf->e32r.e_shoff - sizeof(Elf32_Ehdr), SEEK_CUR);
+  if ((elf->s32r = malloc(sizeof(Elf32_Shdr) * elf->e32r.e_shnum)) == NULL)
     {
       fprintf(stderr, "Malloc out of memory\n");
       exit(1);
     }
-  if (read(fd, elf->shdr, sizeof(Elf64_Shdr) * elf->ehdr.e_shnum) !=
-      (int)sizeof(Elf64_Shdr) * elf->ehdr.e_shnum)
+  if (read(fd, elf->s32r, sizeof(Elf32_Shdr) * elf->e32r.e_shnum) !=
+      (int)sizeof(Elf32_Shdr) * elf->e32r.e_shnum)
     return (file_truncated(elf->filename));
   return (0);
 }
@@ -47,20 +47,20 @@ static int	read_shdr(t_elf *elf, int fd)
 static int	check_shdr(t_elf *elf, int fd)
 {
   int		i;
-  Elf64_Shdr	*shdr;
+  Elf32_Shdr	*shdr;
 
   i = -1;
-  if ((elf->shstrtab = read_section(elf, &elf->shdr[elf->ehdr.e_shstrndx], fd))
+  if ((elf->shstrtab = read_section32(elf, &elf->s32r[elf->e32r.e_shstrndx], fd))
        == NULL)
     {
       fprintf(stderr, "%s: %s: File format not recognized\n",
 	      g_prog_name, elf->filename);
       return (1);
     }
-  while (++i < elf->ehdr.e_shnum)
+  while (++i < elf->e32r.e_shnum)
     {
-      shdr = &elf->shdr[i];
-      if (shdr->sh_name > elf->shdr[elf->ehdr.e_shstrndx].sh_size)
+      shdr = &elf->s32r[i];
+      if (shdr->sh_name > elf->s32r[elf->e32r.e_shstrndx].sh_size)
 	{
 	  fprintf(stderr, "%s: %s: File format not recognized\n",
 	  	  g_prog_name, elf->filename);
@@ -71,7 +71,7 @@ static int	check_shdr(t_elf *elf, int fd)
   return (0);
 }
 
-int	parse_elf(t_elf *elf, int fd)
+int	parse_elf32(t_elf *elf, int fd)
 {
   if (read_shdr(elf, fd) != 0)
     return (1);

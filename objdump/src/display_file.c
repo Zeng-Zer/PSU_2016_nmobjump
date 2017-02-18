@@ -21,14 +21,14 @@ static int	do_64(t_elf *elf, int fd)
   return (0);
 }
 
-static int	do_32(t_elf *elf, int fd) // TODO
+static int	do_32(t_elf *elf, int fd)
 {
   int		ret;
 
-  if ((ret = parse_elf(elf, fd)) != 0)
+  if ((ret = parse_elf32(elf, fd)) != 0)
     return (ret);
-  write_header(elf);
-  write_all_sections(elf, fd);
+  write_header32(elf);
+  write_all_sections32(elf, fd);
   return (0);
 }
 
