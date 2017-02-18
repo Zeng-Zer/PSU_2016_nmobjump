@@ -9,71 +9,29 @@
 */
 
 #include "my_nm.h"
+#include "get_type.c"
 
-static char	get_type(t_elf *elf, Elf64_Sym *sym, Elf64_Shdr *shdr)
+static char	(* const type_sym[5])(Elf64_Sym*, Elf64_Shdr*) =
+{
+  type_uvw,
+  type_shndx,
+  type_brd,
+  type_tdn,
+  type_tr
+};
+
+static char	get_type(Elf64_Sym *sym, Elf64_Shdr *shdr)
 {
   char		c;
+  int		i;
 
-  /* if (strcmp("__init_array_end", get_sym_name(elf, sym->st_name)) != 0) */
-  /*   return ('?'); */
-  /* printf("%d\n", ELF64_ST_BIND(sym->st_info)); */
-  /* exit(1); */
-  /* if (strncmp("__FRAME_END", get_sym_name(elf, sym->st_name), 11) == 0) */
-  /*   { */
-  /*     printf("idx: %d, ", sym->st_shndx); */
-  /*     printf("sh_type: %d, ", shdr[sym->st_shndx].sh_type); */
-  /*     printf("sh_flags: %lu, ", shdr[sym->st_shndx].sh_flags); */
-  /*     printf("str: %s\n", get_sh_name(elf, shdr[sym->st_shndx].sh_name)); */
-  /*   } */
-  /* else if (strncmp(".debug", get_sh_name(elf, elf->shdr[sym->st_shndx].sh_name), 6) == 0) */
-  if (ELF64_ST_BIND(sym->st_info) == STB_GNU_UNIQUE)
-    c = 'u';
-  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK &&
-	   ELF64_ST_TYPE(sym->st_info) == STT_OBJECT)
+  i = -1;
+  while (++i < 5)
     {
-      c = 'V';
-      if (sym->st_shndx == SHN_UNDEF)
-        c = 'v';
+      if ((c = type_sym[i](sym, shdr)) != '?')
+	break;
     }
-  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK)
-    {
-      c = 'W';
-      if (sym->st_shndx == SHN_UNDEF)
-	c = 'w';
-    }
-  else if (sym->st_shndx == SHN_UNDEF)
-    c = 'U';
-  else if (sym->st_shndx == SHN_ABS)
-    c = 'A';
-  else if (sym->st_shndx == SHN_COMMON)
-    c = 'C';
-  else if (shdr[sym->st_shndx].sh_type == SHT_NOBITS &&
-	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-    c = 'B';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
-	   (shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE) ||
-	    shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_STRINGS | SHF_MERGE)))
-    c = 'R';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
-	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-    c = 'D';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
-	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
-    c = 'T';
-  else if (shdr[sym->st_shndx].sh_type == SHT_DYNAMIC)
-    c = 'D';
-  else if (shdr[sym->st_shndx].sh_type == SHT_GROUP)
-    return ('n');
-  else if ((shdr[sym->st_shndx].sh_type == SHT_FINI_ARRAY ||
-	    shdr[sym->st_shndx].sh_type == SHT_INIT_ARRAY) &&
-	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
-    return ('t');
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
-	   MASK(shdr[sym->st_shndx].sh_flags, SHF_ALLOC))
-    c = 'R';
-  else
-    return ('?');
-  if (ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
+  if (c != '?' && ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
     c += 32;
   return c;
 }
@@ -95,7 +53,7 @@ static char	*get_symbol_str(t_elf *elf, Elf64_Sym *sym)
   char		*str;
 
   name = get_sym_name(elf, sym->st_name);
-  type = get_type(elf, sym, elf->shdr);
+  type = get_type(sym, elf->shdr);
   str = malloc(sizeof(char) * (strlen(name) + 20));
   if (type == 'U' || type == 'w')
     sprintf(str, "%16c %c %s", ' ', type, name);

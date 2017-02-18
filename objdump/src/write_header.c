@@ -12,7 +12,8 @@
 #include <stdio.h>
 #include "my_objdump.h"
 
-static t_pair const flag_map[9] = {
+static t_pair const flag_map[9] =
+{
   {HAS_RELOC, "HAS_RELOC"},
   {EXEC_P, "EXEC_P"},
   {HAS_LINENO, "HAS_LINENO"},
@@ -24,7 +25,8 @@ static t_pair const flag_map[9] = {
   {D_PAGED, "D_PAGED"}
 };
 
-static t_pair const arch_map[10] = {
+static t_pair const arch_map[10] =
+{
   {0, "Unknown"},
   {2, "Sparc"},
   {3, "x86"},

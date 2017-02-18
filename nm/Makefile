@@ -52,7 +52,7 @@ re: fclean all
 
 .PHONY: all clean fclean re
 
-.SILENT: all $(NAME) clean fclean re
+.SILENT: all $(NAME) clean fclean re test
 
 .c.o:
 	@$(CC) -c $< -o $@ $(CFLAGS) $(foreach dir, $(INCLUDE), -I$(dir)) && \
