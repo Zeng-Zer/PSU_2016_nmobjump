@@ -10,37 +10,36 @@
 
 #include "my_nm.h"
 
-static char	get_type(t_elf *elf, Elf64_Sym *sym)
+static char	get_type(t_elf *elf, Elf64_Sym *sym, Elf64_Shdr *shdr)
 {
-  bool		local;
+  char		c;
 
-  local = true;
-  if (sym->st_shndx == SHN_ABS)
-    return ('A');
-  /* return ('?'); */
-  if (ELF64_ST_BIND(sym->st_info) == STB_GLOBAL)
-    local = false;
-  /* printf("char: %c, info: %d\n", sym->st_info + 48, sym->st_info); */
-  return (sym->st_info);
-}
-
-char            print_type(Elf64_Sym *sym, Elf64_Shdr *shdr)
-{
-  char  c;
-
+  /* if (strcmp("__init_array_end", get_sym_name(elf, sym->st_name)) != 0) */
+  /*   return ('?'); */
+  /* printf("%d\n", ELF64_ST_BIND(sym->st_info)); */
+  /* exit(1); */
+  /* if (strncmp("__FRAME_END", get_sym_name(elf, sym->st_name), 11) == 0) */
+  /*   { */
+  /*     printf("idx: %d, ", sym->st_shndx); */
+  /*     printf("sh_type: %d, ", shdr[sym->st_shndx].sh_type); */
+  /*     printf("sh_flags: %lu, ", shdr[sym->st_shndx].sh_flags); */
+  /*     printf("str: %s\n", get_sh_name(elf, shdr[sym->st_shndx].sh_name)); */
+  /*   } */
+  /* else if (strncmp(".debug", get_sh_name(elf, elf->shdr[sym->st_shndx].sh_name), 6) == 0) */
   if (ELF64_ST_BIND(sym->st_info) == STB_GNU_UNIQUE)
     c = 'u';
-  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK)
-    {
-      c = 'W';
-      if (sym->st_shndx == SHN_UNDEF)
-        c = 'w';
-    }
-  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK && ELF64_ST_TYPE(sym->st_info) == STT_OBJECT)
+  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK &&
+	   ELF64_ST_TYPE(sym->st_info) == STT_OBJECT)
     {
       c = 'V';
       if (sym->st_shndx == SHN_UNDEF)
         c = 'v';
+    }
+  else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK)
+    {
+      c = 'W';
+      if (sym->st_shndx == SHN_UNDEF)
+	c = 'w';
     }
   else if (sym->st_shndx == SHN_UNDEF)
     c = 'U';
@@ -48,23 +47,33 @@ char            print_type(Elf64_Sym *sym, Elf64_Shdr *shdr)
     c = 'A';
   else if (sym->st_shndx == SHN_COMMON)
     c = 'C';
-  else if (shdr[sym->st_shndx].sh_type == SHT_NOBITS
-       && shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+  else if (shdr[sym->st_shndx].sh_type == SHT_NOBITS &&
+	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
     c = 'B';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym->st_shndx].sh_flags == SHF_ALLOC)
+  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	   (shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE) ||
+	    shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_STRINGS | SHF_MERGE)))
     c = 'R';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
     c = 'D';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS
-       && shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
+  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
     c = 'T';
   else if (shdr[sym->st_shndx].sh_type == SHT_DYNAMIC)
     c = 'D';
+  else if (shdr[sym->st_shndx].sh_type == SHT_GROUP)
+    return ('n');
+  else if ((shdr[sym->st_shndx].sh_type == SHT_FINI_ARRAY ||
+	    shdr[sym->st_shndx].sh_type == SHT_INIT_ARRAY) &&
+	   shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+    return ('t');
+  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	   MASK(shdr[sym->st_shndx].sh_flags, SHF_ALLOC))
+    c = 'R';
   else
-    c = '?';
-  if (ELF64_ST_BIND(sym->st_info) == STB_LOCAL && c != '?')
+    return ('?');
+  if (ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
     c += 32;
   return c;
 }
@@ -86,8 +95,7 @@ static char	*get_symbol_str(t_elf *elf, Elf64_Sym *sym)
   char		*str;
 
   name = get_sym_name(elf, sym->st_name);
-  /* type = get_type(elf, sym); */
-  type = print_type(sym, elf->shdr);
+  type = get_type(elf, sym, elf->shdr);
   str = malloc(sizeof(char) * (strlen(name) + 20));
   if (type == 'U' || type == 'w')
     sprintf(str, "%16c %c %s", ' ', type, name);
