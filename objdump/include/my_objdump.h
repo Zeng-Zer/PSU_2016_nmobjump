@@ -13,7 +13,12 @@
 
 # include <elf.h>
 # include <stdbool.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <unistd.h>
+# include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include "flags.h"
 # include "ar_header.h"
 
@@ -37,10 +42,11 @@ typedef struct	s_pair
 extern char	*g_prog_name;
 
 int		my_objdump(char const *filename);
+int		display_file(char const *filename, int fd, size_t offset);
 int		parse_elf(t_elf *elf, int fd);
 int		file_truncated(char const *filename);
 void		write_header(t_elf *elf);
-void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd);
+void		write_all_sections(t_elf *elf, int fd);
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
 
 #endif /* !MY_OBJDUMP_H_ */

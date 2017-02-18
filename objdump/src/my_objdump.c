@@ -8,12 +8,6 @@
 ** Last update Mon Feb 13 12:03:30 2017 David Zeng
 */
 
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include "my_objdump.h"
 
 static int	open_file(char const *filename)
@@ -32,48 +26,6 @@ static int	open_file(char const *filename)
   if (fd == -1)
     fprintf(stderr, "%s: '%s': No such file\n", g_prog_name, filename);
   return (fd);
-}
-
-static void	write_all_sections(t_elf *elf, int fd)
-{
-  int		i;
-  Elf64_Shdr	*shdr;
-  Elf64_Word	type;
-  char		*name;
-
-  i = -1;
-  while (++i < elf->ehdr.e_shnum)
-    {
-      shdr = &elf->shdr[i];
-      type = shdr->sh_type;
-      name = &elf->shstrtab[shdr->sh_name];
-      if (type != SHT_NULL && type != SHT_NOBITS && type != SHT_SYMTAB &&
-      	  strcmp(name, ".shstrtab") != 0 && strcmp(name, ".strtab") != 0 &&
-	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA) ||
-	   !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
-	  shdr->sh_size != 0)
-	{
-	  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
-	  write_section(elf, shdr, fd);
-	}
-    }
-}
-
-static int	display_file(char const *filename, int fd, size_t offset)
-{
-  t_elf		elf;
-  int		ret;
-
-  elf.shstrtab = NULL;
-  elf.file_start = offset;
-  elf.filename = filename;
-  if ((ret = parse_elf(&elf, fd)) != 0)
-    return (ret);
-  write_header(&elf);
-  write_all_sections(&elf, fd);
-  free(elf.shdr);
-  free(elf.shstrtab);
-  return (0);
 }
 
 static int	loop_archive(int fd)

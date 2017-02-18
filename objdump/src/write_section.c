@@ -8,34 +8,8 @@
 ** Last update Tue Feb 14 12:10:59 2017 David Zeng
 */
 
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
 #include <ctype.h>
-#include <string.h>
 #include "my_objdump.h"
-
-char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd)
-{
-  char		*section;
-  size_t	old_pos;
-
-  section = malloc(sizeof(char) * (sh->sh_size));
-  if (!section)
-    {
-      fprintf(stderr, "Malloc out of memory\n");
-      exit(1);
-    }
-  old_pos = lseek(fd, 0, SEEK_CUR);
-  lseek(fd, elf->file_start + sh->sh_offset, SEEK_SET);
-  if (read(fd, section, sh->sh_size) != (int)sh->sh_size)
-    {
-      free(section);
-      return (NULL);
-    }
-  lseek(fd, old_pos, SEEK_SET);
-  return (section);
-}
 
 static void	print_address(unsigned char *section, size_t size)
 {
@@ -103,7 +77,7 @@ static void	write_content(char *section, size_t size, Elf64_Addr addr)
   printf("\n");
 }
 
-void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
+static void	write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
 {
   char		*section;
   Elf64_Addr	addr;
@@ -114,4 +88,29 @@ void		write_section(t_elf *elf, Elf64_Shdr *shdr, int fd)
   addr = shdr->sh_addr;
   write_content(section, shdr->sh_size, addr);
   free(section);
+}
+
+void		write_all_sections(t_elf *elf, int fd)
+{
+  int		i;
+  Elf64_Shdr	*shdr;
+  Elf64_Word	type;
+  char		*name;
+
+  i = -1;
+  while (++i < elf->ehdr.e_shnum)
+    {
+      shdr = &elf->shdr[i];
+      type = shdr->sh_type;
+      name = &elf->shstrtab[shdr->sh_name];
+      if (type != SHT_NULL && type != SHT_NOBITS && type != SHT_SYMTAB &&
+      	  strcmp(name, ".shstrtab") != 0 && strcmp(name, ".strtab") != 0 &&
+	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA) ||
+	   !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
+	  shdr->sh_size != 0)
+	{
+	  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
+	  write_section(elf, shdr, fd);
+	}
+    }
 }

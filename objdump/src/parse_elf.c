@@ -8,10 +8,6 @@
 ** Last update Mon Feb 13 12:11:35 2017 David Zeng
 */
 
-#include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include "my_objdump.h"
 
 static int	check_ident(Elf64_Ehdr *elf, int fd, char const *filename)

@@ -31,3 +31,12 @@ check
 echo "firefox: "
 diff <(./my_objdump /bin/firefox) <(objdump -fs /bin/firefox)
 check
+echo "ls: "
+diff <(./my_objdump /bin/ls) <(objdump -fs /bin/ls)
+check
+echo "many file: "
+diff <(./my_objdump my_objdump src/main.o ~/.froot/lib/libsfml-network.so ~/.froot/lib/liblapin.a) <(objdump -fs my_objdump src/main.o ~/.froot/lib/libsfml-network.so ~/.froot/lib/liblapin.a)
+check
+echo "double liblapin.a: "
+diff <(./my_objdump ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a) <(objdump -fs ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a)
+check

@@ -8,8 +8,6 @@
 ** Last update Tue Feb 14 00:22:53 2017 David Zeng
 */
 
-#include <stdbool.h>
-#include <stdio.h>
 #include "my_objdump.h"
 
 static t_pair const flag_map[9] =

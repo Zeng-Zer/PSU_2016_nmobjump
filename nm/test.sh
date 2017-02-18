@@ -28,6 +28,3 @@ check
 echo "my_malloc.so: "
 diff <(./my_nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so) <(nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so)
 check
-echo "firefox: "
-diff <(./my_nm /bin/firefox) <(nm /bin/firefox)
-check
