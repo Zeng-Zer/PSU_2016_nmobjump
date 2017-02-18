@@ -40,3 +40,6 @@ check
 echo "double liblapin.a: "
 diff <(./my_objdump ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a) <(objdump -fs ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a)
 check
+echo "32bit: "
+diff <(./my_objdump ~/test/trash/obj32) <(objdump -fs ~/test/trash/obj32)
+check

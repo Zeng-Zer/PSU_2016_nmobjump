@@ -28,3 +28,6 @@ check
 echo "my_malloc.so: "
 diff <(./my_nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so) <(nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so)
 check
+echo "32bit: "
+diff <(./my_nm ~/test/trash/obj32) <(nm ~/test/trash/obj32)
+check

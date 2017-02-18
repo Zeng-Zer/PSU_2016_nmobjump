@@ -14,11 +14,16 @@ INCLUDE		:= include/
 
 SRC		:= main.c \
 		my_nm.c \
-		utils.c \
-		parse_elf.c \
 		ar_parser.c \
 		ar_filename.c \
 		write_symbol.c \
+		utils.c \
+		parse_elf.c \
+		32bit/write_symbol32.c \
+		32bit/utils32.c \
+		32bit/parse_elf32.c \
+		display_file.c \
+		check_ident.c \
 
 CC		:= gcc
 CFLAGS		:= -W -Wall -Wextra -g

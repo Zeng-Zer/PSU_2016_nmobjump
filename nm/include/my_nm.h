@@ -29,12 +29,15 @@ typedef struct	s_elf
   Elf64_Ehdr	ehdr;
   Elf64_Shdr	*shdr;
   Elf64_Sym	*symtab;
+  Elf32_Ehdr	e32r;
+  Elf32_Shdr	*s32r;
+  Elf32_Sym	*s32tab;
   size_t	symsize;
   char const	*filename;
   char		*shstrtab;
   char		*strtab;
-  bool		is_archive;
   size_t	file_start;
+  bool		is32;
 }		t_elf;
 
 extern char	*g_prog_name;
@@ -46,5 +49,14 @@ char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
 char		*get_sh_name(t_elf *elf, Elf64_Word sh_name);
 char		*get_sym_name(t_elf *elf, Elf64_Word sh_name);
 int		write_all_symbol(t_elf *elf, bool many);
+int		display_file(char const *filename, int fd, size_t offset, bool);
+int		check_ident(t_elf *elf, int fd);
+
+// 32 BIT
+char		*get_sym_name32(t_elf *elf, Elf32_Word sh_name);
+char		*read_section32(t_elf *elf, Elf32_Shdr *sh, int fd);
+char		*get_sh_name32(t_elf *elf, Elf32_Word sh_name);
+int		parse_elf32(t_elf *elf, int fd);
+int		write_all_symbol32(t_elf *elf, bool many);
 
 #endif /* !MY_NM_H_ */

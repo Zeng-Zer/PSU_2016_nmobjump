@@ -28,29 +28,6 @@ static int	open_file(char const *filename)
   return (fd);
 }
 
-static int	display_file(char const *filename, int fd, size_t offset,
-			     bool many)
-{
-  t_elf		elf;
-  int		ret;
-
-  elf.symsize = 0;
-  elf.shstrtab = NULL;
-  elf.strtab = NULL;
-  elf.symtab = NULL;
-  elf.file_start = offset;
-  elf.filename = filename;
-  if ((ret = parse_elf(&elf, fd)) != 0)
-    return (ret);
-  if (write_all_symbol(&elf, many) == 1)
-    return (1);
-  free(elf.shdr);
-  free(elf.shstrtab);
-  free(elf.strtab);
-  free(elf.symtab);
-  return (0);
-}
-
 static int	loop_archive(int fd)
 {
   char		*filename;
