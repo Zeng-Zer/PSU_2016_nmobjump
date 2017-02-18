@@ -14,6 +14,7 @@ INCLUDE		:= include/
 
 SRC		:= main.c \
 		my_objdump.c \
+		check_ident.c \
 		display_file.c \
 		parse_elf.c \
 		write_header.c \

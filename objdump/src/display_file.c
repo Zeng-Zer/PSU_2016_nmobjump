@@ -10,19 +10,46 @@
 
 #include "my_objdump.h"
 
+static int	do_64(t_elf *elf, int fd)
+{
+  int		ret;
+
+  if ((ret = parse_elf(elf, fd)) != 0)
+    return (ret);
+  write_header(elf);
+  write_all_sections(elf, fd);
+  return (0);
+}
+
+static int	do_32(t_elf *elf, int fd) // TODO
+{
+  int		ret;
+
+  if ((ret = parse_elf(elf, fd)) != 0)
+    return (ret);
+  write_header(elf);
+  write_all_sections(elf, fd);
+  return (0);
+}
+
 int	display_file(char const *filename, int fd, size_t offset)
 {
   t_elf	elf;
   int	ret;
 
   elf.shstrtab = NULL;
+  elf.shdr = NULL;
+  elf.s32r = NULL;
   elf.file_start = offset;
   elf.filename = filename;
-  if ((ret = parse_elf(&elf, fd)) != 0)
+  if (check_ident(&elf, fd) == 1)
+    return (1);
+  if (elf.is32 && (ret = do_32(&elf, fd)) != 0)
     return (ret);
-  write_header(&elf);
-  write_all_sections(&elf, fd);
+  if (!elf.is32 && (ret = do_64(&elf, fd)) != 0)
+    return (ret);
   free(elf.shdr);
+  free(elf.s32r);
   free(elf.shstrtab);
   return (0);
 }

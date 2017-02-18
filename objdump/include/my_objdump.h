@@ -28,9 +28,12 @@ typedef struct	s_elf
 {
   Elf64_Ehdr	ehdr;
   Elf64_Shdr	*shdr;
+  Elf32_Ehdr	e32r;
+  Elf32_Shdr	*s32r;
   char		*shstrtab;
   char const	*filename;
   size_t	file_start;
+  bool		is32;
 }		t_elf;
 
 typedef struct	s_pair
@@ -48,5 +51,6 @@ int		file_truncated(char const *filename);
 void		write_header(t_elf *elf);
 void		write_all_sections(t_elf *elf, int fd);
 char		*read_section(t_elf *elf, Elf64_Shdr *sh, int fd);
+int		check_ident(t_elf *elf, int fd);
 
 #endif /* !MY_OBJDUMP_H_ */
