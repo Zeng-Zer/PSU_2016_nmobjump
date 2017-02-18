@@ -64,6 +64,8 @@ int	my_nm(char const *filename, bool many)
     return (1);
   if (is_archive(fd))
     {
+      if (many)
+	printf("\n%s:\n", filename);
       if ((ret = loop_archive(fd)) == -1)
   	{
   	  fprintf(stderr, "%s: %s: Malformed archive\n", g_prog_name, filename);

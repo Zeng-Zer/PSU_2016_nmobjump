@@ -28,6 +28,12 @@ check
 echo "my_malloc.so: "
 diff <(./my_nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so) <(nm ~/rendu/PSU/PSU_2016_malloc/libmy_malloc.so)
 check
+echo "many file: "
+diff <(./my_nm my_nm src/main.o ~/.froot/lib/libsfml-network.so ~/.froot/lib/liblapin.a) <(nm my_nm src/main.o ~/.froot/lib/libsfml-network.so ~/.froot/lib/liblapin.a)
+check
+echo "double liblapin.a: "
+diff <(./my_nm ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a) <(nm ~/.froot/lib/liblapin.a ~/.froot/lib/liblapin.a)
+check
 echo "32bit: "
 diff <(./my_nm ~/test/trash/obj32) <(nm ~/test/trash/obj32)
 check
