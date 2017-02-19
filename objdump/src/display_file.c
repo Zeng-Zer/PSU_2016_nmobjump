@@ -37,11 +37,8 @@ int	display_file(char const *filename, int fd, size_t offset)
   t_elf	elf;
   int	ret;
 
-  elf.shstrtab = NULL;
-  elf.shdr = NULL;
-  elf.s32r = NULL;
-  elf.file_start = offset;
-  elf.filename = filename;
+  elf = (t_elf) {.shstrtab = NULL, .shdr = NULL, .s32r = NULL,
+		 .file_start = offset, .filename = filename};
   if (check_ident(&elf, fd) == 1)
     return (1);
   if (elf.is32 && (ret = do_32(&elf, fd)) != 0)
@@ -51,5 +48,7 @@ int	display_file(char const *filename, int fd, size_t offset)
   free(elf.shdr);
   free(elf.s32r);
   free(elf.shstrtab);
+  if (offset == 0)
+    close(fd);
   return (0);
 }

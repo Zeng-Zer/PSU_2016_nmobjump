@@ -31,7 +31,9 @@ clean:
 	$(MAKE) -C $(DIR_NM) clean
 	$(MAKE) -C $(DIR_OBJDUMP) clean
 
-fclean: clean
+fclean:
+	$(MAKE) -C $(DIR_NM) fclean
+	$(MAKE) -C $(DIR_OBJDUMP) fclean
 	$(RM) $(NAME_NM)
 	$(RM) $(NAME_OBJDUMP)
 

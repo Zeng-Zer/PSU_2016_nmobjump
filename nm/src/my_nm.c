@@ -52,6 +52,7 @@ static int	loop_archive(int fd)
 	  break;
 	}
     }
+  close(fd);
   return (ret == 1 ? -1 : ret2);
 }
 
@@ -73,5 +74,7 @@ int	my_nm(char const *filename, bool many)
   	}
       return (ret);
     }
-  return (display_file(filename, fd, 0, many));
+  ret = display_file(filename, fd, 0, many);
+  close(fd);
+  return (ret);
 }

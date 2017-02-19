@@ -1,5 +1,9 @@
 #! /bin/bash
 
+if [ ! -f ./my_nm ];
+then make re
+fi
+
 function check() {
     if [ "$?" == "1" ];
     then echo "KO"

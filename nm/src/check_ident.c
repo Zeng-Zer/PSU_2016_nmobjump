@@ -17,9 +17,8 @@ int	check_ident(t_elf *elf, int fd)
   ret = read(fd, &elf->ehdr, sizeof(Elf64_Ehdr));
   if (ret == 0)
     return (1);
-  if (ret != sizeof(Elf64_Ehdr))
-    return (file_truncated(elf->filename));
-  if (elf->ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
+  if (ret != sizeof(Elf64_Ehdr) ||
+      elf->ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
       elf->ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
       elf->ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
       elf->ehdr.e_ident[EI_MAG3] != ELFMAG3)

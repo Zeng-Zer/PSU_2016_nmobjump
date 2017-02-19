@@ -52,5 +52,7 @@ int	display_file(char const *filename, int fd, size_t offset, bool many)
   free(elf.s32tab);
   free(elf.shstrtab);
   free(elf.strtab);
+  if (offset == 0)
+    close(fd);
   return (0);
 }

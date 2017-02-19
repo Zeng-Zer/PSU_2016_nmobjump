@@ -52,6 +52,7 @@ static int	loop_archive(int fd)
 	  break;
 	}
     }
+  close(fd);
   return (ret == 1 ? -1 : ret2);
 }
 
@@ -72,5 +73,7 @@ int		my_objdump(char const *filename)
 	}
       return (ret);
     }
-  return (display_file(filename, fd, 0));
+  ret = display_file(filename, fd, 0);
+  close(fd);
+  return (ret);
 }
