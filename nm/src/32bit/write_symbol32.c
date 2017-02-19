@@ -73,7 +73,7 @@ static void	write_symbol(t_elf *elf, char **tab)
       free(tab[i]);
     }
   if (i == 0)
-    printf("%s: %s: no symbols\n", g_prog_name, elf->filename);
+    fprintf(stderr, "%s: %s: no symbols\n", g_prog_name, elf->filename);
 }
 
 int		write_all_symbol32(t_elf *elf, bool many)
