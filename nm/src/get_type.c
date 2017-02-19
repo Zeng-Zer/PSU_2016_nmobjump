@@ -18,6 +18,8 @@ static char	type_uvw(Elf64_Sym *sym, Elf64_Shdr *shdr)
   c = '?';
   if (ELF64_ST_BIND(sym->st_info) == STB_GNU_UNIQUE)
     c = 'u';
+  else if (ELF64_ST_TYPE(sym->st_info) == STT_GNU_IFUNC)
+    c = 'i';
   else if (ELF64_ST_BIND(sym->st_info) == STB_WEAK &&
 	   ELF64_ST_TYPE(sym->st_info) == STT_OBJECT)
     {
@@ -54,8 +56,7 @@ static char	type_brd(Elf64_Sym *sym, Elf64_Shdr *shdr)
   char		c;
 
   c = '?';
-  if (shdr[sym->st_shndx].sh_type == SHT_NOBITS &&
-      shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
+  if (shdr[sym->st_shndx].sh_type == SHT_NOBITS)
     c = 'B';
   else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
 	   (shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_MERGE) ||
@@ -76,14 +77,17 @@ static char	type_tdn(Elf64_Sym *sym, Elf64_Shdr *shdr)
   if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
       shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_EXECINSTR))
     c = 'T';
-  else if (shdr[sym->st_shndx].sh_type == SHT_DYNAMIC)
+  else if (shdr[sym->st_shndx].sh_type == SHT_DYNAMIC ||
+	   shdr[sym->st_shndx].sh_type == SHT_PREINIT_ARRAY ||
+	   (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	    MASK(shdr[sym->st_shndx].sh_flags, SHF_TLS)))
     c = 'D';
   else if (shdr[sym->st_shndx].sh_type == SHT_GROUP)
     c = 'N';
   return (c);
 }
 
-static char	type_tr(Elf64_Sym *sym, Elf64_Shdr *shdr)
+static char	type_trn(Elf64_Sym *sym, Elf64_Shdr *shdr)
 {
   char		c;
 
@@ -92,8 +96,11 @@ static char	type_tr(Elf64_Sym *sym, Elf64_Shdr *shdr)
        shdr[sym->st_shndx].sh_type == SHT_INIT_ARRAY) &&
       shdr[sym->st_shndx].sh_flags == (SHF_ALLOC | SHF_WRITE))
     c = 'T';
-  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
-	   MASK(shdr[sym->st_shndx].sh_flags, SHF_ALLOC))
+  else if ((shdr[sym->st_shndx].sh_type == SHT_PROGBITS &&
+	    MASK(shdr[sym->st_shndx].sh_flags, SHF_ALLOC)) ||
+	   shdr[sym->st_shndx].sh_type == SHT_NOTE)
     c = 'R';
+  else if (shdr[sym->st_shndx].sh_type == SHT_PROGBITS)
+    c = 'N';
   return (c);
 }

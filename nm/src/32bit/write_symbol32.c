@@ -17,7 +17,7 @@ static char	(* const type_sym[5])(Elf32_Sym*, Elf32_Shdr*) =
   type_shndx32,
   type_brd32,
   type_tdn32,
-  type_tr32
+  type_trn32
 };
 
 static char	get_type(Elf32_Sym *sym, Elf32_Shdr *shdr)
@@ -31,7 +31,7 @@ static char	get_type(Elf32_Sym *sym, Elf32_Shdr *shdr)
       if ((c = type_sym[i](sym, shdr)) != '?')
 	break;
     }
-  if (c != '?' && ELF32_ST_BIND(sym->st_info) == STB_LOCAL)
+  if (c != '?' && c != 'i' && ELF32_ST_BIND(sym->st_info) == STB_LOCAL)
     c += 32;
   return c;
 }
@@ -55,7 +55,7 @@ static char	*get_symbol_str(t_elf *elf, Elf32_Sym *sym)
   name = get_sym_name(elf, sym->st_name);
   type = get_type(sym, elf->s32r);
   str = malloc(sizeof(char) * (strlen(name) + 12));
-  if (type == 'U' || type == 'w')
+  if (type == 'U' || type == 'w' || type == 'v')
     sprintf(str, "%8c %c %s", ' ', type, name);
   else
     sprintf(str, "%08x %c %s", sym->st_value, type, name);

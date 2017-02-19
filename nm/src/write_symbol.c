@@ -17,7 +17,7 @@ static char	(* const type_sym[5])(Elf64_Sym*, Elf64_Shdr*) =
   type_shndx,
   type_brd,
   type_tdn,
-  type_tr
+  type_trn
 };
 
 static char	get_type(Elf64_Sym *sym, Elf64_Shdr *shdr)
@@ -31,7 +31,7 @@ static char	get_type(Elf64_Sym *sym, Elf64_Shdr *shdr)
       if ((c = type_sym[i](sym, shdr)) != '?')
 	break;
     }
-  if (c != '?' && ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
+  if (c != '?' && c != 'i' && ELF64_ST_BIND(sym->st_info) == STB_LOCAL)
     c += 32;
   return c;
 }
@@ -55,7 +55,7 @@ static char	*get_symbol_str(t_elf *elf, Elf64_Sym *sym)
   name = get_sym_name(elf, sym->st_name);
   type = get_type(sym, elf->shdr);
   str = malloc(sizeof(char) * (strlen(name) + 20));
-  if (type == 'U' || type == 'w')
+  if (type == 'U' || type == 'w' || type == 'v')
     sprintf(str, "%16c %c %s", ' ', type, name);
   else
     sprintf(str, "%016lx %c %s", sym->st_value, type, name);

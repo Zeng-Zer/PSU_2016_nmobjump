@@ -105,8 +105,8 @@ void		write_all_sections(t_elf *elf, int fd)
       name = &elf->shstrtab[shdr->sh_name];
       if (type != SHT_NULL && type != SHT_NOBITS && type != SHT_SYMTAB &&
       	  strcmp(name, ".shstrtab") != 0 && strcmp(name, ".strtab") != 0 &&
-	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA) ||
-	   !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
+	  ((MASK(elf->ehdr.e_flags, HAS_RELOC) && type != SHT_RELA &&
+	    type != SHT_REL) || !MASK(elf->ehdr.e_flags, HAS_RELOC)) &&
 	  shdr->sh_size != 0)
 	{
 	  printf("Contents of section %s:\n", &elf->shstrtab[shdr->sh_name]);
