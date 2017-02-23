@@ -11,17 +11,21 @@
 NAME_NM		:= my_nm
 NAME_OBJDUMP	:= my_objdump
 
-DIR_NM		:= nm/
-DIR_OBJDUMP	:= objdump/
+DIR_NM		:= src_nm/
+DIR_OBJDUMP	:= src_objdump/
 
 MV		:= mv
 RM		:= rm -f
 
 all: $(NAME_NM) $(NAME_OBJDUMP)
 
+nm: $(NAME_NM)
+
 $(NAME_NM):
 	$(MAKE) -C $(DIR_NM)
 	$(MV) $(DIR_NM)$(NAME_NM) ./
+
+objdump: $(NAME_OBJDUMP)
 
 $(NAME_OBJDUMP):
 	$(MAKE) -C $(DIR_OBJDUMP)

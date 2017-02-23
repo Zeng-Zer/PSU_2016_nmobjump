@@ -35,6 +35,12 @@ static int	read_sh(t_elf *elf, Elf32_Shdr *shdr, int fd)
   if (shdr->sh_type == SHT_SYMTAB)
     {
       elf->s32tab = (Elf32_Sym *)read_section32(elf, shdr, fd);
+      if (!elf->s32tab)
+	{
+	  fprintf(stderr, "%s: %s: File format not recognized\n",
+	  	  g_prog_name, elf->filename);
+	  return (1);
+	}
       elf->symsize = shdr->sh_size / sizeof(Elf32_Sym);
     }
   return (0);

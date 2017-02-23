@@ -25,7 +25,6 @@ char		*read_section32(t_elf *elf, Elf32_Shdr *sh, int fd)
   lseek(fd, elf->file_start + sh->sh_offset, SEEK_SET);
   if (read(fd, section, sh->sh_size) != (int)sh->sh_size)
     {
-      file_truncated(elf->filename);
       free(section);
       return (NULL);
     }
